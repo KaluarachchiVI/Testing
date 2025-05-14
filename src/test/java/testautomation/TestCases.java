@@ -3,6 +3,9 @@ package testautomation;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
+import io.github.bonigarcia.wdm.WebDriverManager;
+
 
 import java.time.Duration;
 
@@ -15,7 +18,11 @@ public class TestCases {
 
     @BeforeEach
     public void setup() {
-        driver = new ChromeDriver();
+
+        WebDriverManager.chromedriver().setup(); // Automatically handles ChromeDriver setup
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200"); // Headless mode
+        driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
