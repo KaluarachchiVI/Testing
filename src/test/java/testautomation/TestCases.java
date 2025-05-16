@@ -3,9 +3,6 @@ package testautomation;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import io.github.bonigarcia.wdm.WebDriverManager;
-
 
 import java.time.Duration;
 
@@ -18,20 +15,13 @@ public class TestCases {
 
     @BeforeEach
     public void setup() {
-
-        WebDriverManager.chromedriver().setup(); // Automatically handles ChromeDriver setup
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("--headless", "--disable-gpu", "--window-size=1920,1200"); // Headless mode
-        driver = new ChromeDriver(options);
+        driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
     @AfterEach
     public void tearDown() {
-
-        // if (driver != null) {
-        //     driver.quit();
-        // }
+        driver.quit();
     }
 
     @Test
@@ -66,7 +56,6 @@ public class TestCases {
 
         WebElement error = driver.findElement(By.id("error"));
         assertTrue(error.isDisplayed());
-
     }
     @Test
     public void testLoginButtonVisibility() {
@@ -74,7 +63,7 @@ public class TestCases {
 
         WebElement loginBtn = driver.findElement(By.id("submit"));
         assertTrue(loginBtn.isDisplayed());
-
+        assertTrue(loginBtn.isEnabled());
     }
     @Test
     public void testUsernameFieldMaxLength() {
@@ -100,7 +89,7 @@ public class TestCases {
         driver.findElement(By.id("password")).sendKeys("Password123");
         loginBtn.click();
 
-        assertTrue(driver.getCurrentUrl().contains("logged-in-successfully-and button is clic"));
+        assertTrue(driver.getCurrentUrl().contains("logged-in-successfully"));
     }
     @Test
     public void testPostLoginRedirection() {
@@ -109,26 +98,21 @@ public class TestCases {
         driver.findElement(By.id("username")).sendKeys("student");
         driver.findElement(By.id("password")).sendKeys("Password123");
         driver.findElement(By.id("submit")).click();
-
-        // Confirm redirect to success page
+// Confirm redirect to success page
         assertTrue(driver.getCurrentUrl().contains("logged-in-successfully"));
     }
     @Test
     public void testMultipleFailedLoginAttempts() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
-
         for (int i = 0; i < 3; i++) {
             driver.findElement(By.id("username")).clear();
             driver.findElement(By.id("password")).clear();
-
             driver.findElement(By.id("username")).sendKeys("student");
             driver.findElement(By.id("password")).sendKeys("WrongPass" + i);
             driver.findElement(By.id("submit")).click();
-
             WebElement error = driver.findElement(By.id("error"));
             assertTrue(error.isDisplayed());
             assertEquals("Your password is invalid!", error.getText());
         }
     }
-
 }
