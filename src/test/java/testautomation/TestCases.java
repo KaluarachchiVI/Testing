@@ -22,10 +22,10 @@ public class TestCases {
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
     }
 
-    @AfterEach
-    public void tearDown() {
-        driver.quit();
-    }
+   // @AfterEach
+    //public void tearDown() {
+        //driver.quit();
+   // }
 
     @Test
     public void testValidLogin() {
@@ -47,11 +47,12 @@ public class TestCases {
         driver.findElement(By.id("password")).sendKeys("WrongPassword");
         driver.findElement(By.id("submit")).click();
 
-        // Validate error message
-        WebElement error = driver.findElement(By.id("error"));
-        System.out.println("Actual error: " + error.getText());
-        assertTrue(error.getText().contains("Your password is invalid!"));
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
+        WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("error")));
+
+        assertTrue(error.getText().trim().contains("Your password is invalid"));
     }
+
     @Test
     public void testEmptyFormSubmission() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
