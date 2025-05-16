@@ -3,6 +3,9 @@ package testautomation;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+
 
 import java.time.Duration;
 
@@ -46,6 +49,7 @@ public class TestCases {
 
         // Validate error message
         WebElement error = driver.findElement(By.id("error"));
+        System.out.println("Actual error: " + error.getText());
         assertTrue(error.getText().contains("Your password is invalid!"));
     }
     @Test
@@ -84,10 +88,12 @@ public class TestCases {
         assertTrue(loginBtn.isDisplayed());
         assertTrue(loginBtn.isEnabled());
 
-        // Enter valid credentials to test button functionality
         driver.findElement(By.id("username")).sendKeys("student");
         driver.findElement(By.id("password")).sendKeys("Password123");
         loginBtn.click();
+
+        new WebDriverWait(driver, Duration.ofSeconds(10))
+                .until(ExpectedConditions.urlContains("logged-in-successfully"));
 
         assertTrue(driver.getCurrentUrl().contains("logged-in-successfully"));
     }
