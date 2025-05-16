@@ -3,9 +3,8 @@ package testautomation;
 import org.junit.jupiter.api.*;
 import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-
+import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
 
@@ -15,17 +14,19 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 public class TestCases {
     WebDriver driver;
+    WebDriverWait wait;
 
     @BeforeEach
     public void setup() {
         driver = new ChromeDriver();
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().window().maximize();
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
     }
 
-   // @AfterEach
-    //public void tearDown() {
-        //driver.quit();
-   // }
+    @AfterEach
+    public void tearDown() {
+        if (driver != null) driver.quit();
+    }
 
     @Test
     public void testValidLogin() {
@@ -35,10 +36,10 @@ public class TestCases {
         driver.findElement(By.id("password")).sendKeys("Password123");
         driver.findElement(By.id("submit")).click();
 
-        // Validate successful login
-        WebElement message = driver.findElement(By.className("post-title"));
-        assertTrue(message.getText().contains("Logged In Successfully"));
+        WebElement message = wait.until(ExpectedConditions.visibilityOfElementLocated(By.className("post-title")));
+        assertTrue(message.getText().trim().contains("Logged In Successfully"));
     }
+
     @Test
     public void testInvalidLoginWrongPassword() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
@@ -47,45 +48,44 @@ public class TestCases {
         driver.findElement(By.id("password")).sendKeys("WrongPassword");
         driver.findElement(By.id("submit")).click();
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("error")));
-
-        assertTrue(error.getText().trim().contains("Your password is invalid"));
+        assertEquals("Your password is invalid!", error.getText().trim());
     }
 
     @Test
     public void testEmptyFormSubmission() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
-
         driver.findElement(By.id("submit")).click();
 
-        WebElement error = driver.findElement(By.id("error"));
+        WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("error")));
         assertTrue(error.isDisplayed());
     }
+
     @Test
     public void testLoginButtonVisibility() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
 
-        WebElement loginBtn = driver.findElement(By.id("submit"));
+        WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submit")));
         assertTrue(loginBtn.isDisplayed());
         assertTrue(loginBtn.isEnabled());
     }
+
     @Test
     public void testUsernameFieldMaxLength() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
 
-        String longUsername = "a".repeat(256); // sending 256 characters
+        String longUsername = "a".repeat(256);
         WebElement usernameField = driver.findElement(By.id("username"));
         usernameField.sendKeys(longUsername);
 
         assertEquals(256, usernameField.getAttribute("value").length());
     }
+
     @Test
     public void testLoginButtonClickability() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
 
-        WebElement loginBtn = driver.findElement(By.id("submit"));
-
+        WebElement loginBtn = wait.until(ExpectedConditions.elementToBeClickable(By.id("submit")));
         assertTrue(loginBtn.isDisplayed());
         assertTrue(loginBtn.isEnabled());
 
@@ -93,11 +93,9 @@ public class TestCases {
         driver.findElement(By.id("password")).sendKeys("Password123");
         loginBtn.click();
 
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.urlContains("logged-in-successfully"));
-
-        assertTrue(driver.getCurrentUrl().contains("logged-in-successfully"));
+        assertTrue(wait.until(ExpectedConditions.urlContains("logged-in-successfully")));
     }
+
     @Test
     public void testPostLoginRedirection() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
@@ -105,21 +103,24 @@ public class TestCases {
         driver.findElement(By.id("username")).sendKeys("student");
         driver.findElement(By.id("password")).sendKeys("Password123");
         driver.findElement(By.id("submit")).click();
-// Confirm redirect to success page
-        assertTrue(driver.getCurrentUrl().contains("logged-in-successfully"));
+
+        assertTrue(wait.until(ExpectedConditions.urlContains("logged-in-successfully")));
     }
+
     @Test
     public void testMultipleFailedLoginAttempts() {
         driver.get("https://practicetestautomation.com/practice-test-login/");
+
         for (int i = 0; i < 3; i++) {
             driver.findElement(By.id("username")).clear();
             driver.findElement(By.id("password")).clear();
             driver.findElement(By.id("username")).sendKeys("student");
             driver.findElement(By.id("password")).sendKeys("WrongPass" + i);
             driver.findElement(By.id("submit")).click();
-            WebElement error = driver.findElement(By.id("error"));
+
+            WebElement error = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("error")));
             assertTrue(error.isDisplayed());
-            assertEquals("Your password is invalid!", error.getText());
+            assertEquals("Your password is invalid!", error.getText().trim());
         }
     }
 }
