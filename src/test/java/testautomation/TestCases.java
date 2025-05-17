@@ -24,7 +24,9 @@ public class TestCases {
         ChromeOptions options = new ChromeOptions();
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-        wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // <-- this line was missing
+        wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        System.out.println("Hello World!");
+
     }
 
     @AfterEach
