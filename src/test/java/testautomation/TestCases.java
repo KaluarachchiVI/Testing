@@ -25,7 +25,7 @@ public class TestCases {
         driver = new ChromeDriver(options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
         wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        System.out.println("Hello World!");
+
 
     }
 
